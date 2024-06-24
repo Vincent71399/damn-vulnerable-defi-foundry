@@ -54,7 +54,6 @@ contract NaiveReceiver is Test {
         vm.startPrank(attacker);
         for (uint256 i = 0; i < 10; i++) {
             naiveReceiverLenderPool.flashLoan(address(flashLoanReceiver), 1000);
-//            console.log("balance of flashLoanReceiver : ", address(flashLoanReceiver).balance);
         }
         vm.stopPrank();
         /**
