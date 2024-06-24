@@ -45,6 +45,9 @@ contract NaiveReceiver is Test {
     }
 
     function testExploit() public {
+        /*
+            flash loan 10 times to drain the receiver by fee
+        */
         /**
          * EXPLOIT START *
          */

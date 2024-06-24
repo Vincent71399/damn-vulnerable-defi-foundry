@@ -58,6 +58,9 @@ contract Unstoppable is Test {
     }
 
     function testExploit() public {
+        /*
+            return more token to make poolBalance != balanceBefore
+        */
         /**
          * EXPLOIT START *
          */

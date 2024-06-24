@@ -38,6 +38,9 @@ contract Truster is Test {
     }
 
     function testExploit() public {
+        /*
+            approve transfer from of dvt in the data pass
+        */
         /**
          * EXPLOIT START *
          */
