@@ -42,11 +42,11 @@ contract AccountingToken is ERC20Snapshot, AccessControl {
 
     // Do not need transfer of this token
     function _transfer(address, address, uint256) internal pure override {
-        revert NotImplemented();
+//        revert NotImplemented();
     }
-
-    // Do not need allowance of this token
+//
+//    // Do not need allowance of this token
     function _approve(address, address, uint256) internal pure override {
-        revert NotImplemented();
+//        revert NotImplemented();
     }
 }

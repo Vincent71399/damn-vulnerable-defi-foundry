@@ -3,13 +3,14 @@ pragma solidity 0.8.17;
 
 import {IERC20} from "openzeppelin-contracts/token/ERC20/IERC20.sol";
 import {FlashLoanerPool} from "../../../src/Contracts/the-rewarder/FlashLoanerPool.sol";
+import {AccountingToken} from "../../../src/Contracts/the-rewarder/AccountingToken.sol";
 import {TheRewarderPool} from "../../../src/Contracts/the-rewarder/TheRewarderPool.sol";
 
 interface IReceiver {
     function receiveFlashLoan(uint256 amount) external;
 }
 
-contract TheRewarderAttacker is IReceiver{
+contract TheRewarderAttacker is IReceiver {
     FlashLoanerPool public lendingPool;
     TheRewarderPool public theRewarderPool;
     IERC20 public dvtToken;
