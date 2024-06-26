@@ -53,11 +53,6 @@ contract TheRewarder is Test {
 
         theRewarderPool = new TheRewarderPool(address(dvt));
 
-        console.log("Alice : ", theRewarderPool.accToken().balanceOf(alice));
-        console.log("lastSnapshotIdForRewards : ", theRewarderPool.lastSnapshotIdForRewards());
-        console.log("lastRecordedSnapshotTimestamp : ", theRewarderPool.lastRecordedSnapshotTimestamp());
-        console.log("total Supply At : ", theRewarderPool.accToken().totalSupplyAt(theRewarderPool.lastSnapshotIdForRewards()));
-
         // Alice, Bob, Charlie and David deposit 100 tokens each
         for (uint8 i; i < 4; i++) {
             dvt.transfer(users[i], USER_DEPOSIT);
@@ -67,8 +62,6 @@ contract TheRewarder is Test {
             assertEq(theRewarderPool.accToken().balanceOf(users[i]), USER_DEPOSIT);
             vm.stopPrank();
         }
-
-        console.log("lastSnapshotIdForRewards : ", theRewarderPool.lastSnapshotIdForRewards());
 
         assertEq(theRewarderPool.accToken().totalSupply(), USER_DEPOSIT * 4);
         assertEq(theRewarderPool.rewardToken().totalSupply(), 0);
@@ -107,7 +100,6 @@ contract TheRewarder is Test {
         vm.warp(block.timestamp + 5 days);
         attackerContract.attack(dvtInPool);
         uint256 rewardValue = theRewarderPool.rewardToken().balanceOf(address(attackerContract));
-        console.log("Result : ", rewardValue);
         vm.stopPrank();
 
         //transfer reward token to attacker
